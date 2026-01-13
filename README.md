@@ -1,6 +1,14 @@
-# Correct 2D/3D Drift (Fiji Jython)
+# Correct 2D/3D Drift (Fiji Jython) with GPU phase correlation (CLIJ2/VkFFT)
 
 This repository contains a Fiji/ImageJ Jython script that measures and corrects translational drift in 2D or 3D time-lapse data. It uses phase correlation to estimate frame-to-frame shifts and can optionally apply sub-pixel correction.
+
+GPU phase correlation (CLIJ2/VkFFT) is implemented via CLIJ2 and VkFFT:
+- Convert frames to `ClearCLBuffer` objects with CLIJ2.
+- Call a JNI wrapper (`VkFFTPhaseCorrelation`) that loads the native library `clijx_vkfft`.
+- The JNI code receives the OpenCL context/queue/buffer pointers from ClearCL and runs VkFFT-based phase correlation on the GPU.
+- A plugin wrapper (`PhaseCorrelationFFT`) exposes this to scripting and returns the shift vector.
+
+This requires a compiled `clijx_vkfft` native library and a `CLIJX_VKFFT_PATH` (or PATH) entry so Fiji can load it.
 
 ## What it does
 - Computes translation-only drift across time frames in 2D or 3D stacks
@@ -10,25 +18,11 @@ This repository contains a Fiji/ImageJ Jython script that measures and corrects 
 - Optional edge enhancement and background thresholding
 - Can save output as a virtual stack to reduce RAM usage
 
-## Quick start
-1. Open a time-lapse stack or hyperstack in Fiji.
-2. Run the script from the Plugins menu (see INSTALLATION.md).
-3. Choose options in the dialog and run.
-
-## Getting started (GPU variant)
+## Getting started
 1. Install the modified `clijx_-0.32.2.0.jar` into `Fiji.app/plugins/`.
 2. Place `clijx_vkfft.dll` anywhere and set `CLIJX_VKFFT_PATH` to its full path.
 3. Install `Correct_3D_drift_clij2.py` into your Plugins menu.
 4. Restart Fiji and run the CLIJ2 script. The Log should report the GPU name and "GPU phase correlation active".
-
-## GPU phase correlation (CLIJ2/VkFFT)
-In the GPU-accelerated variant (implemented in the related CLIJX codebase), phase correlation is computed on the GPU using VkFFT. The flow is:
-- Convert frames to `ClearCLBuffer` objects with CLIJ2.
-- Call a JNI wrapper (`VkFFTPhaseCorrelation`) that loads the native library `clijx_vkfft`.
-- The JNI code receives the OpenCL context/queue/buffer pointers from ClearCL and runs VkFFT-based phase correlation on the GPU.
-- A plugin wrapper (`PhaseCorrelationFFT`) exposes this to scripting and returns the shift vector.
-
-This requires a compiled `clijx_vkfft` native library and a `CLIJX_VKFFT_PATH` (or PATH) entry so Fiji can load it.
 
 ## Troubleshooting
 - "GPU phase correlation unavailable, falling back to CPU": check `CLIJX_VKFFT_PATH` points to `clijx_vkfft.dll` and restart Fiji.
@@ -36,8 +30,9 @@ This requires a compiled `clijx_vkfft` native library and a `CLIJX_VKFFT_PATH` (
 - "Unable to access native OpenCL pointer": verify you are using the modified `clijx_-0.32.2.0.jar`, not the stock CLIJx JAR.
 
 ## Files
-- `Correct_3D_drift.py`: main Jython script
 - `Correct_3D_drift_clij2.py`: CLIJ2/VkFFT-enabled variant
+- `clijx_-0.32.2.0.jar`: modified CLIJx plugin with VkFFT phase correlation
+- `clijx_vkfft.dll`: native VkFFT library for GPU phase correlation
 - `installation.md`: how to install and register the script in Fiji
 - `user_manual.md`: usage guide and option descriptions
 - `change.md`: differences between the original and CLIJ2/VkFFT variants
@@ -49,4 +44,4 @@ This requires a compiled `clijx_vkfft` native library and a `CLIJX_VKFFT_PATH` (
 - VkFFT: https://github.com/DTolm/VkFFT
 
 ## License
-This script is licensed under GPL-3.0 (see header in `Correct_3D_drift.py`).
+This script is licensed under GPL-3.0 (see header in `Correct_3D_drift_clij2.py`).
