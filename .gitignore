@@ -1,0 +1,10 @@
+.tools/
+clijx-assistant/
+clijx-dev/
+CorrectBleach/
+clijx-local/
+clijx_-0.32.2.0.jar.bak
+*.log
+**/target/
+**/build/
+Clijx.code-workspace

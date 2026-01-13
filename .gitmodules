@@ -1,0 +1,6 @@
+[submodule "clijx"]
+	path = clijx
+	url = https://github.com/darkbreaker0/clijx
+[submodule "Correct_3D_Drift"]
+	path = Correct_3D_Drift
+	url = https://github.com/darkbreaker0/Correct_3D_Drift
