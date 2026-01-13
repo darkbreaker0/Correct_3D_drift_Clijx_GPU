@@ -31,8 +31,8 @@ Open a time-lapse image and run the script. You should see a dialog titled "Corr
 
 ## GPU/CLIJ2 setup (optional)
 1. Copy `Correct_3D_drift_clij2.py` to the same menu location you used above.
-2. Place `clijx_vkfft.dll` anywhere on disk (for example `C:\Apps\clijx_vkfft.dll`).
-3. Set the environment variable:
+2. Place `clijx_vkfft.dll` in `Fiji.app\lib\win64\` (auto-detected), or anywhere on disk.
+3. If you do not use `Fiji.app\lib\win64\`, set the environment variable:
    `CLIJX_VKFFT_PATH=C:\Apps\clijx_vkfft.dll`
 4. Restart Fiji and run the CLIJ2 script. The Log window should report the GPU name and "GPU phase correlation active".
 
