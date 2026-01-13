@@ -30,6 +30,11 @@ In the GPU-accelerated variant (implemented in the related CLIJX codebase), phas
 
 This requires a compiled `clijx_vkfft` native library and a `CLIJX_VKFFT_PATH` (or PATH) entry so Fiji can load it.
 
+## Troubleshooting
+- "GPU phase correlation unavailable, falling back to CPU": check `CLIJX_VKFFT_PATH` points to `clijx_vkfft.dll` and restart Fiji.
+- "no clijx_vkfft in java.library.path": the native DLL is not found; set `CLIJX_VKFFT_PATH` or put the DLL on `PATH`.
+- "Unable to access native OpenCL pointer": verify you are using the modified `clijx_-0.32.2.0.jar`, not the stock CLIJx JAR.
+
 ## Files
 - `Correct_3D_drift.py`: main Jython script
 - `Correct_3D_drift_clij2.py`: CLIJ2/VkFFT-enabled variant
