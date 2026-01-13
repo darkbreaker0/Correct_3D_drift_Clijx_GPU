@@ -37,5 +37,5 @@ Open a time-lapse image and run the script. You should see a dialog titled "Corr
 4. Restart Fiji and run the CLIJ2 script. The Log window should report the GPU name and "GPU phase correlation active".
 
 ## Developer/integration notes
-- Native VkFFT sources live under `clijx/src/main/native/vkfft_phase_correlation/`.
-- VkFFT is vendored under `clijx/third_party/VkFFT` and is required to rebuild `clijx_vkfft.dll`.
+- Native VkFFT sources live under `clijx-local/src/main/native/vkfft_phase_correlation/`.
+- VkFFT is vendored under `clijx-local/third_party/VkFFT` and is required to rebuild `clijx_vkfft.dll`.
