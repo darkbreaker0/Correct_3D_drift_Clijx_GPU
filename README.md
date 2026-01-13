@@ -15,6 +15,12 @@ This repository contains a Fiji/ImageJ Jython script that measures and corrects 
 2. Run the script from the Plugins menu (see INSTALLATION.md).
 3. Choose options in the dialog and run.
 
+## Getting started (GPU variant)
+1. Install the modified `clijx_-0.32.2.0.jar` into `Fiji.app/plugins/`.
+2. Place `clijx_vkfft.dll` anywhere and set `CLIJX_VKFFT_PATH` to its full path.
+3. Install `Correct_3D_drift_clij2.py` into your Plugins menu.
+4. Restart Fiji and run the CLIJ2 script. The Log should report the GPU name and "GPU phase correlation active".
+
 ## GPU phase correlation (CLIJ2/VkFFT)
 In the GPU-accelerated variant (implemented in the related CLIJX codebase), phase correlation is computed on the GPU using VkFFT. The flow is:
 - Convert frames to `ClearCLBuffer` objects with CLIJ2.
