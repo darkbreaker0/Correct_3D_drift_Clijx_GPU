@@ -57,9 +57,27 @@ from java.lang import Integer
 import math, os, os.path
 
 # CLIJ2
-from net.haesleinhuepf.clij2 import CLIJ2
 from java.lang import System as JavaSystem
-IJ.log("CLIJ2 GPU: " + CLIJ2.getInstance().getGPUName())
+from java.lang import Throwable as JavaThrowable
+
+# Guard GPU/CLIJ2 initialization so a missing dependency (e.g. the org.jocl
+# 'jocl' jar) or an unavailable OpenCL driver produces a clear, visible error
+# instead of silently aborting the whole script before any dialog appears.
+# NoClassDefFoundError is a java.lang.Error, which a plain "except Exception"
+# does NOT catch in Jython - hence the explicit JavaThrowable in the handler.
+_init_error = None
+try:
+  from net.haesleinhuepf.clij2 import CLIJ2
+  IJ.log("CLIJ2 GPU: " + str(CLIJ2.getInstance().getGPUName()))
+except (Exception, JavaThrowable) as _e:
+  CLIJ2 = None
+  _init_error = ("CLIJ2 / GPU could not be initialized:\n  " + str(_e)
+    + "\n\nA required library is likely missing from Fiji.app/jars (the CLIJ2"
+      " OpenCL backend needs the org.jocl 'jocl' jar), or no OpenCL GPU driver"
+      " is available.\nOpen Help > Update..., enable the CLIJ/CLIJ2 update"
+      " sites, apply changes, then restart Fiji.")
+  IJ.log("ERROR: " + _init_error)
+
 from net.imglib2.realtransform import AffineTransform2D, AffineTransform3D
 
 # set native DLL path if build output is present and env var not set
@@ -92,7 +110,12 @@ if _vkfft_env is None or _vkfft_env == "":
 else:
   JavaSystem.setProperty("CLIJX_VKFFT_PATH", _vkfft_env)
 
-from net.haesleinhuepf.clijx.plugins import PhaseCorrelationFFT
+try:
+  from net.haesleinhuepf.clijx.plugins import PhaseCorrelationFFT
+except (Exception, JavaThrowable) as _e:
+  PhaseCorrelationFFT = None
+  IJ.log("WARNING: clijx PhaseCorrelationFFT unavailable (" + str(_e)
+    + "); GPU phase correlation disabled, CPU phase correlation will be used.")
 
 # sub-pixel translation using imglib2 (CPU fallback)
 from net.imagej.axis import Axes
@@ -184,7 +207,7 @@ def compute_shift(imp1, imp2):
     buf2.close()
     IJ.log("GPU phase correlation active")
     return Point3i(int(round(shift[0])), int(round(shift[1])), int(round(shift[2])))
-  except Exception as e:
+  except (Exception, JavaThrowable) as e:
     IJ.log("GPU phase correlation unavailable, falling back to CPU: " + str(e))
     return compute_shift_cpu(imp1, imp2)
 
@@ -581,6 +604,10 @@ def save_shifts(shifts, roi):
 def run():
 
   IJ.log("Correct_3D_Drift (CLIJ2 translation)")
+
+  if _init_error is not None:
+    IJ.error("Correct 3D Drift (CLIJ2)", _init_error)
+    return
 
   imp = IJ.getImage()
   if imp is None:
