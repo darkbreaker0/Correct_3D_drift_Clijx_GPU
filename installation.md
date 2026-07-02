@@ -6,6 +6,10 @@
 
 ## GPU/CLIJ2 requirements (optional)
 - CLIJ2 and the modified CLIJx JAR (`clijx_-0.32.2.0.jar`) installed in `Fiji.app/plugins/`
+- The `org.jocl` JOCL binding jar (e.g. `jocl-2.0.2.jar`) in `Fiji.app/jars/`. This is the
+  OpenCL backend CLIJ2 depends on and is normally installed automatically by the CLIJ/CLIJ2
+  update sites. It is **not** the JogAmp `jocl.jar` (package `com.jogamp.opencl`) that ships
+  with Fiji's 3D viewer — CLIJ2 requires package `org.jocl` (class `org.jocl.NativePointerObject`).
 - The native VkFFT library `clijx_vkfft.dll`
 - Environment variable `CLIJX_VKFFT_PATH` pointing to the full path of `clijx_vkfft.dll`
 
@@ -35,6 +39,14 @@ Open a time-lapse image and run the script. You should see a dialog titled "Corr
 3. If you do not use `Fiji.app\lib\win64\`, set the environment variable:
    `CLIJX_VKFFT_PATH=C:\Apps\clijx_vkfft.dll`
 4. Restart Fiji and run the CLIJ2 script. The Log window should report the GPU name and "GPU phase correlation active".
+
+### Troubleshooting
+- **Nothing happens when you run the CLIJ2 script (no dialog, no error):** the `org.jocl`
+  JOCL jar is missing from `Fiji.app/jars/`. CLIJ2 then fails to initialize with
+  `NoClassDefFoundError: org/jocl/NativePointerObject`, which aborts the script before the
+  options dialog appears. Fix: re-enable the CLIJ/CLIJ2 update sites via `Help > Update...`,
+  or drop a `jocl-2.0.x.jar` (package `org.jocl`) into `Fiji.app/jars/`, then restart Fiji.
+  The current script surfaces this as a dialog instead of failing silently.
 
 ## Developer/integration notes
 - Native VkFFT sources live under `clijx-local/src/main/native/vkfft_phase_correlation/`.
